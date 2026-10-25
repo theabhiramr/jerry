@@ -1,0 +1,11 @@
+.silkscreen-regular {
+  font-family: "Silkscreen", monospace;
+  font-weight: normal;
+  font-style: normal;
+}
+
+.silkscreen-bold {
+  font-family: "Silkscreen", monospace;
+  font-weight: bold;
+  font-style: normal;
+}

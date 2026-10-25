@@ -13,7 +13,7 @@
   "license": "ISC",
   "author": "",
   "type": "commonjs",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "cd src && node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"

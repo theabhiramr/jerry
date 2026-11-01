@@ -10,15 +10,16 @@
     "type": "git",
     "url": "git+https://github.com/theabhiramr/jerry.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "author": "",
   "type": "commonjs",
   "main": "server.js",
+  "customElements": "custom-elements.json",
   "scripts": {
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "dependencies": {
-    "express": "^5.3.0"
+    "express": "^5.3.0",
+    "marked": "^18.1.2"
   }
 }

@@ -14,11 +14,12 @@
   "author": "",
   "type": "commonjs",
   "main": "server.js",
-  "customElements": "custom-elements.json",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "watch": "node --watch server.js"
   },
   "dependencies": {
+    "dedent": "^1.7.2",
     "express": "^5.3.0",
     "marked": "^18.1.2"
   }

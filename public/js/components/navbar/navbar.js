@@ -1,10 +1,18 @@
+import sheet from "./navbar.css" with { type: "css" };
+
 class AppNavbar extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot.adoptedStyleSheets = [sheet];
+  }
+
   connectedCallback() {
     this.render();
   }
 
   render() {
-    this.innerHTML = `
+    this.shadowRoot.innerHTML = `
     <div class="navbar">
       <div class="navbar-left">
         <a href="/" class="navbar-logo">Jerry</a>

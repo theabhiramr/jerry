@@ -25,20 +25,31 @@ CREATE TABLE site_members (
 );
 
 CREATE TABLE pages (
-  id          integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  site_id     integer NOT NULL REFERENCES sites (id) ON DELETE CASCADE,
-  title       text NOT NULL,
-  slug        text NOT NULL,
-  meta        jsonb NOT NULL DEFAULT '{}', -- stuff from the frontmatter
-  summary     text NOT NULL DEFAULT '',
-  contents    text NOT NULL, -- I may want to replace this with a link to a revisions table.
-  created_at  timestampz NOT NULL DEFAULT now(),
-  updated_at  timestampz NOT NULL DEFAULT now(),
-  deleted_at  timestampz -- soft delete for pages
+  id                    integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  site_id               integer NOT NULL REFERENCES sites (id) ON DELETE CASCADE,
+  title                 text NOT NULL,
+  slug                  text NOT NULL,
+  current_revision_id   integer,
+  meta                  jsonb NOT NULL DEFAULT '{}', -- stuff from the frontmatter
+  created_at            timestampz NOT NULL DEFAULT now(),
+  updated_at            timestampz NOT NULL DEFAULT now(),
+  deleted_at            timestampz -- soft delete for pages
 );
 
 CREATE UNIQUE INDEX pages_slug_key ON pages (site_id, slug) WHERE deleted_at IS NULL;
 -- probably needs more stuff once we are actually querying
+
+CREATE TABLE revisions (
+  id          integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  page_id     integer NOT NULL REFERENCES pages (id) ON DELETE CASCADE,
+  author_id   integer REFERENCES users (id) ON DELETE SET NULL,
+  content     text NOT NULL,
+  summary     text NOT NULL DEFAULT '',
+  created_at  timestampz NOT NULL DEFAULT now(),
+);
+
+ALTER TABLE pages ADD CONSTRAINT pages_current_revision_fkey
+  FOREIGN KEY (current_revision_id) REFERENCES revisions (id);
 
 CREATE TABLE comments (
   id          integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

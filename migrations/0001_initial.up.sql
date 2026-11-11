@@ -7,6 +7,14 @@ CREATE TABLE users (
   created_at  timestampz NOT NULL DEFAULT now()
 );
 
+CREATE TABLE sessions (
+  id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id     integer NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  token       text NOT NULL UNIQUE,
+  created_at  timestampz NOT NULL DEFAULT now(),
+  expires_at  timestampz NOT NULL
+)
+
 CREATE TABLE sites (
   id          integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   slug        text NOT NULL UNIQUE,

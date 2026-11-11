@@ -13,6 +13,24 @@ Welcome to Jerry! This is a worldbuilding website written ENTIRELY in Vanilla JS
 - Express
 - PostgreSQL
 
+## How to Run
+
+### Database
+
+1. Create database if it doesn't exist:
+
+   ```bash
+   createdb jerry
+   ```
+
+2. Copy the env file and set the database URL:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3.
+
 ## Changelog
 
 v1.0.0 - Initial release (in development)

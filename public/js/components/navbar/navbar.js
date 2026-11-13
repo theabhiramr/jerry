@@ -1,4 +1,9 @@
-import sheet from "./navbar.css" with { type: "css" };
+// CSS module scripts (`import ... with { type: "css" }`) aren't supported in
+// Safari/WebKit, so build a constructable stylesheet from the fetched CSS instead.
+const sheet = new CSSStyleSheet();
+sheet.replaceSync(
+  await fetch(new URL("./navbar.css", import.meta.url)).then((r) => r.text()),
+);
 
 class AppNavbar extends HTMLElement {
   constructor() {

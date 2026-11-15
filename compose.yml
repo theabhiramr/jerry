@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:18
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER:-jerry}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-jerry}"
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U jerry -d jerry"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  pg_data:

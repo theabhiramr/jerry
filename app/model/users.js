@@ -7,6 +7,6 @@ import pg from "pg";
  */
 export const create = (pool, { username, email, passwordHash }) =>
   pool.query(
-    `INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, is_site_admin, created_at`,
+    `INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, created_at`,
     [username, email || null, passwordHash],
   );

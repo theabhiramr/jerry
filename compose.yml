@@ -16,5 +16,32 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+  jerry:
+    build:
+      context: .
+    ports:
+      - "127.0.0.1:3000:3000"
+    develop:
+      watch:
+        - action: sync
+          path: ./app
+          target: /app/app
+          ignore:
+            - node_modules/
+        - action: sync
+          path: ./public
+          target: /app/public
+          ignore:
+            - node_modules/
+        - action: sync
+          path: ./server.js
+          target: /app/server.js
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+    depends_on:
+      - postgres
+
 volumes:
   pg_data:

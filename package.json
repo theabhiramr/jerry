@@ -20,6 +20,7 @@
     "db:init": "psql \"$DATABASE_URL\" -f db/schema.sql"
   },
   "dependencies": {
+    "argon2": "^0.45.2",
     "cookie-parser": "^1.4.7",
     "dedent": "^1.7.2",
     "dotenv": "^18.0.10",

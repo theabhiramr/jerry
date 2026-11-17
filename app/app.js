@@ -1,6 +1,10 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const publicDir = path.join(import.meta.dirname, "..", "public");
 
 const dependencies = {
   marked: "marked.esm.js",
@@ -21,12 +25,12 @@ export function createApp({ db, options }) {
   const importMapTag = `<script type="importmap">${JSON.stringify(importMap)}</script>`;
 
   app.use(express.json());
-  app.use(express.static(path.join(__dirname, "public"), { index: false }));
+  app.use(express.static(publicDir, { index: false }));
 
   app.get("/{*splat}", async (req, res, next) => {
     if (path.extname(req.path)) return next();
     const html = await fs.promises.readFile(
-      path.join(path.join(__dirname, "public"), "index.html"),
+      path.join(publicDir, "index.html"),
       "utf8",
     );
     res.type("html").send(html.replace("<!-- importmap -->", importMapTag));

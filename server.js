@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { createApp } from "app/app.js";
-import { createPool } from "app/db";
+import { createApp } from "./app/app.js";
+import { createPool } from "./app/db";
 
 const hostname = "localhost";
 const port = 3000;

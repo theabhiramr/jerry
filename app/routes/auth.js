@@ -18,7 +18,11 @@ function createAuth({ db, options }) {
   let tokens = {};
 
   function validLoginBody(body) {
-    if (!body.hasOwnProperty("username") || !body.hasOwnProperty("password") || !body.hasOwnProperty("email")) {
+    if (
+      !body.hasOwnProperty("username") ||
+      !body.hasOwnProperty("password") ||
+      !body.hasOwnProperty("email")
+    ) {
       return false;
     }
     let { username, email, password } = body;
@@ -69,7 +73,17 @@ function createAuth({ db, options }) {
 
     try {
       result = await create(db, { username, email, passwordhash });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Something went wrong" });
     }
+
+    let token = generateToken();
+    tokens[token] = result.rows[0].id;
+    return res
+      .cookie("token", token, cookieOptions)
+      .status(200)
+      .json({ message: "Success" });
   });
 
   router.post("/login", (req, res) => {});

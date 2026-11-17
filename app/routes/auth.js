@@ -45,7 +45,7 @@ router.post("/register", async (req, res) => {
   
   let result;
   try {
-    result = await 
+    result = await findByUsername(req.app.locals.db, username); 
   }
 
 router.post("/login", (req, res) => {});

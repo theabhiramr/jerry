@@ -1,0 +1,42 @@
+CREATE TABLE users(
+    name TEXT, email TEXT, password TEXT, 
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY, 
+    settings[] TEXT REFERENCES projects(id)
+);
+
+CREATE TABLE folder(
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    project_id INT NOT NULL REFERENCES projects(id),
+    parent_folder_id INT REFERENCES folder(id),
+    name TEXT NOT NULL
+);
+
+CREATE TABLE sites(
+    name TEXT, url TEXT, user_id INT REFERENCES users(id), 
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY
+);
+
+CREATE TABLE posts(
+    type TEXT REFERENCES postTemplates(templates),  user_id INT REFERENCES users(id),
+    site_id INT REFERENCES sites(id), visits INT DEFAULT 0, image_url TEXT, title TEXT, 
+    description TEXT, active BOOLEAN DEFAULT FALSE, tags TEXT[], id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    commentSection[] TEXT REFERENCES comments
+);
+
+CREATE TABLE comments(user_id INT REFERENCES users(id),
+    post_id INT REFERENCES posts(id),
+    comment TEXT, active BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE postTemplates(
+    templates TEXT[], layout TEXT, description TEXT
+);
+
+CREATE TABLE postViews (
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    user_id INT REFERENCES users(id),
+    post_id INT NOT NULL REFERENCES posts(id),
+);
+
+
+

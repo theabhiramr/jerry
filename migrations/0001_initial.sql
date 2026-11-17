@@ -39,10 +39,11 @@ CREATE TABLE pages (
   slug                  text NOT NULL,
   current_revision_id   integer,
   meta                  jsonb NOT NULL DEFAULT '{}', -- stuff from the frontmatter
-  created_at            timestamp NOT NULL DEFAULT now(),
-  updated_at            timestamp NOT NULL DEFAULT now(),
-  deleted_at            timestamp -- soft delete for pages
+  created_at            timestampz NOT NULL DEFAULT now(),
+  updated_at            timestampz NOT NULL DEFAULT now(),
+  deleted_at            timestampz -- soft delete for pages
 );
+
 
 CREATE UNIQUE INDEX pages_slug_key ON pages (site_id, slug) WHERE deleted_at IS NULL;
 -- probably needs more stuff once we are actually querying

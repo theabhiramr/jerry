@@ -1,5 +1,8 @@
-import { query } from "../db";
+import { query } from "../db/index.js";
 
+/**
+ * @param {import("pg").Pool | import("pg").PoolClient} pool
+ */
 export const create = (pool, { slug, name, description, owner_id }) =>
   query(
     pool,

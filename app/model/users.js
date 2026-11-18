@@ -3,7 +3,6 @@ import { query } from "../db/index.js";
 
 /**
  * @param {pg.Pool | pg.PoolClient} pool
- * returns a promise
  * @returns {Promise<any>}
  */
 export const create = (pool, { username, email, passwordHash }) =>

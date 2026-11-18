@@ -1,10 +1,10 @@
 import express from "express";
-import cookieParser from "cookie-parser";
 import argon2 from "argon2";
 import crypto from "crypto";
 import { create, findByUsername, getPasswordHash } from "../model/users.js";
 
-function createAuth({ db, options }) {
+export function authRouter({ db, options }) {
+  console.log("setting up auther router");
   const router = express.Router();
 
   const WEEK_IN_MS = 1000 * 60 * 60 * 24 * 7;
@@ -18,6 +18,8 @@ function createAuth({ db, options }) {
   let tokens = {};
 
   function validLoginBody(body) {
+    console.log(`got body: ${JSON.stringify(body)}`);
+    return true;
     if (
       !body.hasOwnProperty("username") ||
       !body.hasOwnProperty("password") ||
@@ -49,11 +51,11 @@ function createAuth({ db, options }) {
       return res.status(400).json({ error: "Invalid request body" });
     }
 
-    let { username, password } = req.body;
+    let { username, password, email } = req.body;
 
     let result;
     try {
-      result = await findByUsername(req.app.locals.db, username);
+      result = await findByUsername(db, username);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: "Something went wrong" });
@@ -65,7 +67,7 @@ function createAuth({ db, options }) {
 
     let passwordHash;
     try {
-      passwrordHash = await argon2.hash(password);
+      passwordHash = await argon2.hash(password);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: "Something went wrong" });
@@ -117,7 +119,7 @@ function createAuth({ db, options }) {
       return res.status(500).json({ error: "Something went wrong" });
     }
 
-    let token = generateToken();
+    let token = generateToken(); // TODO: store token in session table
     tokens[token] = result.rows[0].id;
     return res
       .cookie("token", token, cookieOptions)

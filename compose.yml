@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: "${POSTGRES_USER:-jerry}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-jerry}"
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql
       - ./migrations:/docker-entrypoint-initdb.d:ro
@@ -19,8 +19,10 @@ services:
   jerry:
     build:
       context: .
+    environment:
+      - DEBUG=express:*,router,router:*
     ports:
-      - "127.0.0.1:3000:3000"
+      - "3000:3000"
     develop:
       watch:
         - action: sync
@@ -34,8 +36,8 @@ services:
           ignore:
             - node_modules/
         - action: sync
-          path: ./server.js
-          target: /app/server.js
+          path: ./server.mjs
+          target: /app/server.mjs
           ignore:
             - node_modules/
         - action: rebuild

@@ -5,4 +5,4 @@ RUN npm ci --only=production
 COPY . .
 USER node
 EXPOSE 3000
-CMD ["node", "--watch", "server.js"]
+CMD ["node", "--watch", "server.mjs"]

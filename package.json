@@ -13,10 +13,10 @@
   "license": "MIT",
   "author": "",
   "type": "module",
-  "main": "server.js",
+  "main": "server.mjs",
   "scripts": {
-    "start": "node server.js",
-    "watch": "node --watch server.js",
+    "start": "node server.mjs",
+    "watch": "node --watch server.mjs",
     "db:init": "psql \"$DATABASE_URL\" -f db/schema.sql"
   },
   "dependencies": {

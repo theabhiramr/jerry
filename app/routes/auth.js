@@ -18,8 +18,6 @@ export function authRouter({ db, options }) {
   let tokens = {};
 
   function validLoginBody(body) {
-    console.log(`got body: ${JSON.stringify(body)}`);
-    return true;
     if (
       !body.hasOwnProperty("username") ||
       !body.hasOwnProperty("password") ||

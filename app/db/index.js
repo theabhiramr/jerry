@@ -9,16 +9,17 @@ export function createPool(connectionString) {
  * @param {pg.Pool | pg.PoolClient} pool
  */
 export async function query(pool, q, values) {
+  const client = await pool.connect();
   try {
-    await pool.query("BEGIN");
+    await client.query("BEGIN");
     let result = await pool.query(q, values);
-    await pool.query("COMMIT");
+    await client.query("COMMIT");
     return result;
   } catch (err) {
     console.error(err);
-    await pool.query("ROLLBACK");
+    await client.query("ROLLBACK");
   } finally {
-    await pool.release();
+    await client.release();
   }
 }
 

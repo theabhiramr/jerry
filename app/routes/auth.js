@@ -4,10 +4,10 @@ import crypto from "crypto";
 import { create, findByUsername, getPasswordHash } from "../model/users.js";
 
 export function authRouter({ db, options }) {
-  console.log("setting up auther router");
   const router = express.Router();
 
   const WEEK_IN_MS = 1000 * 60 * 60 * 24 * 7;
+
   /** @type {import("express").CookieOptions} */
   let cookieOptions = {
     httpOnly: true,

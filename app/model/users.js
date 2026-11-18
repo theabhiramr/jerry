@@ -15,11 +15,16 @@ export const create = (pool, { username, email, passwordHash }) =>
 /**
  * @param {pg.Pool | pg.PoolClient } pool
  * @param {string} username
- * finds a user by username
- * @returns {Promise<any>}
+ * TODO: this is ugly...
+ *
+ * @returns {Promise<import("pg").QueryResult<import("./index.d.ts").User>>}
  */
 export const findByUsername = (pool, username) =>
-  query(pool, `SELECT * FROM users WHERE username = $1`, [username]);
+  query(
+    pool,
+    `SELECT id, username, email active, created_at FROM users WHERE username = $1`,
+    [username],
+  );
 
 /**
  * @param {pg.Pool | pg.PoolClient } pool

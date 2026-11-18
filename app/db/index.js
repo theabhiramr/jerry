@@ -1,31 +1,48 @@
 import pg from "pg";
 
-export function createPool(connectionString) {
-  // will need to set up actual transaction stuff with begin/commit/rollback. helper method.
-  const pool = new pg.Pool({ connectionString });
-  return pool;
-}
 /**
- * @param {pg.Pool | pg.PoolClient} pool
+ * @param {string} connectionString
+ * @returns {import("pg").Pool}
  */
-export async function query(pool, q, values) {
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    let result = await pool.query(q, values);
-    await client.query("COMMIT");
-    return result;
-  } catch (err) {
-    console.error(err);
-    await client.query("ROLLBACK");
-  } finally {
-    await client.release();
-  }
+export function createPool(connectionString) {
+  return new pg.Pool({ connectionString });
 }
 
 /**
- * @param {pg.Pool | pg.PoolClient} pool
+ * @param {import("pg").Pool | import("pg").PoolClient} db
+ * @param {string | import("pg").QueryArrayConfig<any>} sql
+ * @param {any[]} params
  */
-export async function one(pool, q, values) {
-  return await query(pool, q, values)?.[0];
+export function query(db, sql, params) {
+  return db.query(sql, params);
+}
+
+/**
+ * @param {import("pg").Pool | import("pg").PoolClient} db
+ * @param {string | import("pg").QueryArrayConfig<any>} sql
+ * @param {any[]} params
+ */
+export async function one(db, sql, params) {
+  return (await db.query(sql, params)).rows[0];
+}
+
+/**
+ * @template T
+ * @param {import("pg").Pool} pool
+ * @param {(client: import("pg").PoolClient) => T} fn
+ * @returns {Promise<T>}
+ */
+async function tx(pool, fn) {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const result = await fn(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }

@@ -1,7 +1,6 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
-import cookieParser from "cookie-parser";
 import { apiRouter } from "./routes/api.js";
 
 // const require = createRequire(import.meta.url);
@@ -14,8 +13,6 @@ import { apiRouter } from "./routes/api.js";
 
 export function createApp({ db, options }) {
   const app = express();
-  app.use(express.json());
-  app.use(cookieParser());
   app.use("/api", apiRouter({ db, options }));
 
   // const importMap = { imports: {} };

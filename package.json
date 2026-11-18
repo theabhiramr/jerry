@@ -16,8 +16,7 @@
   "main": "server.mjs",
   "scripts": {
     "start": "node server.mjs",
-    "watch": "node --watch server.mjs",
-    "db:init": "psql \"$DATABASE_URL\" -f db/schema.sql"
+    "watch": "node --watch server.mjs"
   },
   "dependencies": {
     "argon2": "^0.45.2",

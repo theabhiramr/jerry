@@ -8,6 +8,7 @@ export function authRouter({ db, options }) {
   const router = express.Router();
 
   const WEEK_IN_MS = 1000 * 60 * 60 * 24 * 7;
+  /** @type {import("express").CookieOptions} */
   let cookieOptions = {
     httpOnly: true,
     secure: true,

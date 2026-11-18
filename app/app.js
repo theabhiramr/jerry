@@ -1,22 +1,23 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
-import { createRequire } from "module";
-
 import cookieParser from "cookie-parser";
+import { apiRouter } from "./routes/api.js";
 
-const require = createRequire(import.meta.url);
-const publicDir = path.join(import.meta.dirname, "..", "public");
-
-const dependencies = {
-  marked: "marked.esm.js",
-  dedent: "dedent.mjs",
-};
+// const require = createRequire(import.meta.url);
+// const publicDir = path.join(import.meta.dirname, "..", "public");
+//
+// const dependencies = {
+//   marked: "marked.esm.js",
+//   dedent: "dedent.mjs",
+// };
 
 export function createApp({ db, options }) {
   const app = express();
   app.use(express.json());
   app.use(cookieParser());
+  app.use("/api", apiRouter({ db, options }));
+
   // const importMap = { imports: {} };
   // for (const [name, file] of Object.entries(dependencies)) {
   //   const dir = path.dirname(require.resolve(name));

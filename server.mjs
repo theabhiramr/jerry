@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { createApp } from "./app/app.js";
 import { createPool } from "./app/db/index.js";
-import { authRouter } from "./app/routes/auth.js";
 
 const hostname = "0.0.0.0";
 const port = 3000;
@@ -11,8 +10,6 @@ const pool = createPool(connectionString);
 console.log("got db");
 const app = createApp({ db: pool, options: {} });
 console.log("created app");
-app.use("/auth", authRouter({ db: pool, options: {} }));
-console.log("added auth router");
 
 app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);

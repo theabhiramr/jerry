@@ -2,7 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import argon2 from "argon2";
 import crypto from "crypto";
-import { create, findByUsername } from "../model/users.js";
+import { create, findByUsername, getPasswordHash } from "../model/users.js";
 
 function createAuth({ db, options }) {
   const router = express.Router();
@@ -60,7 +60,7 @@ function createAuth({ db, options }) {
     }
 
     if (result.rows.length > 0) {
-      return res.status(400).json({ error: "Invalid username/password" });
+      return res.status(400).json({ error: "User already exists" });
     }
 
     let passwordHash;
@@ -72,7 +72,7 @@ function createAuth({ db, options }) {
     }
 
     try {
-      result = await create(db, { username, email, passwordhash });
+      result = await create(db, { username, email, passwordHash });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: "Something went wrong" });
@@ -86,5 +86,63 @@ function createAuth({ db, options }) {
       .json({ message: "Success" });
   });
 
-  router.post("/login", (req, res) => {});
+  router.post("/login", async (req, res) => {
+    if (!validLoginBody(req.body)) {
+      return res.status(400).json({ error: "Incorrect username or password" });
+    }
+    let { username, password } = req.body;
+
+    let result;
+    try {
+      result = await getPasswordHash(db, username);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Something went wrong" });
+    }
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ error: "Incorrect username or password" });
+    }
+
+    let passwordHash = result.rows[0].hash;
+    let validPassword;
+    try {
+      if (!(await argon2.verify(passwordHash, password))) {
+        return res
+          .status(400)
+          .json({ error: "Incorrect username or password" });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Something went wrong" });
+    }
+
+    let token = generateToken();
+    tokens[token] = result.rows[0].id;
+    return res
+      .cookie("token", token, cookieOptions)
+      .status(200)
+      .json({ message: "Success" });
+  });
+
+  router.post("/logout", (req, res) => {
+    let { token } = req.cookies;
+    if (token !== undefined) {
+      delete tokens[token];
+    }
+    return res
+      .clearCookie("token", cookieOptions)
+      .status(200)
+      .json({ message: "Success" });
+  });
+
+  router.get("/me", (req, res) => {
+    let { token } = req.cookies;
+    if (token === undefined || !tokens.hasOwnProperty(token)) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+    return res.status(200).json({ userId: tokens[token] });
+  });
+
+  return router;
 }

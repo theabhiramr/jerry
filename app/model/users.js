@@ -1,4 +1,5 @@
 import pg from "pg";
+import { query } from "../db/index.js";
 
 /**
  * @param {pg.Pool | pg.PoolClient} pool
@@ -6,8 +7,9 @@ import pg from "pg";
  * @returns {Promise<any>}
  */
 export const create = (pool, { username, email, passwordHash }) =>
-  pool.query(
-    `INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, created_at`,
+  query(
+    pool,
+    `INSERT INTO users (username, email, hash) VALUES ($1, $2, $3) RETURNING id, username, created_at`,
     [username, email || null, passwordHash],
   );
 
@@ -18,4 +20,13 @@ export const create = (pool, { username, email, passwordHash }) =>
  * @returns {Promise<any>}
  */
 export const findByUsername = (pool, username) =>
-  pool.query(`SELECT * FROM users WHERE username = $1`, [username]);
+  query(pool, `SELECT * FROM users WHERE username = $1`, [username]);
+
+/**
+ * @param {pg.Pool | pg.PoolClient } pool
+ * @param {string} username
+ * validates a user by password hash
+ * @returns {Promise<any>}
+ */
+export const getPasswordHash = (pool, username) =>
+  query(pool, `SELECT hash FROM users WHERE username = $1`, [username]);

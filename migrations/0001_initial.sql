@@ -4,15 +4,15 @@ CREATE TABLE users (
   email       text,
   hash        text NOT NULL, -- for now just creating a password hash
   active      boolean default true,
-  created_at  timestamp NOT NULL DEFAULT now()
+  created_at  timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE TABLE sessions (
-  id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  id          integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   user_id     integer NOT NULL REFERENCES users (id) ON DELETE CASCADE,
   token       text NOT NULL UNIQUE,
-  created_at  timestamp NOT NULL DEFAULT now(),
-  expires_at  timestamp NOT NULL
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  expires_at  timestamptz NOT NULL
 );
 
 CREATE TABLE sites (
@@ -21,14 +21,14 @@ CREATE TABLE sites (
   name        text NOT NULL,
   description text NOT NULL DEFAULT '',
   owner_id    integer NOT NULL REFERENCES users (id),
-  created_at  timestamp NOT NULL DEFAULT now()
+  created_at  timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE TABLE site_members (
   site_id     integer NOT NULL REFERENCES sites (id) ON DELETE CASCADE,
   user_id     integer NOT NULL REFERENCES users (id) ON DELETE CASCADE,
   role        text NOT NULL CHECK (role IN ('admin', 'editor', 'member')), -- Something I picked up from work is to not use pg enums
-  created_at  timestamp NOT NULL DEFAULT now(),
+  created_at  timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (site_id, user_id) -- I love composite primary keys 
 );
 
@@ -39,9 +39,9 @@ CREATE TABLE pages (
   slug                  text NOT NULL,
   current_revision_id   integer,
   meta                  jsonb NOT NULL DEFAULT '{}', -- stuff from the frontmatter
-  created_at            timestampz NOT NULL DEFAULT now(),
-  updated_at            timestampz NOT NULL DEFAULT now(),
-  deleted_at            timestampz -- soft delete for pages
+  created_at            timestamptz NOT NULL DEFAULT now(),
+  updated_at            timestamptz NOT NULL DEFAULT now(),
+  deleted_at            timestamptz -- soft delete for pages
 );
 
 
@@ -54,7 +54,7 @@ CREATE TABLE revisions (
   author_id   integer REFERENCES users (id) ON DELETE SET NULL,
   content     text NOT NULL,
   summary     text NOT NULL DEFAULT '',
-  created_at  timestamp NOT NULL DEFAULT now()
+  created_at  timestamptz NOT NULL DEFAULT now()
 );
 
 ALTER TABLE pages ADD CONSTRAINT pages_current_revision_fkey
@@ -65,8 +65,8 @@ CREATE TABLE comments (
   page_id     integer NOT NULL REFERENCES pages (id) ON DELETE CASCADE,
   author_id   integer REFERENCES users (id) ON DELETE SET NULL,
   body        text NOT NULL, --comment length?
-  created_at  timestamp NOT NULL DEFAULT now(),
-  deleted_at  timestamp -- soft deletes again
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  deleted_at  timestamptz -- soft deletes again
 );
 
 -- TODO: indexes

@@ -3,6 +3,7 @@ import argon2 from "argon2";
 import crypto from "crypto";
 import { create, findByUsername, getPasswordHash } from "../model/users.js";
 import * as sessions from "../model/sessions.js";
+import * as sites from "../model/sites.js";
 import { requireUser } from "../middleware/session.js";
 
 const isEmpty = (value) =>
@@ -130,8 +131,13 @@ export function authRouter({ db, options }) {
 			.json({ message: "Success" });
 	});
 
-	router.get("/me", requireUser, async (req, res) => {
+	router.get("/me", requireUser, (req, res) => {
 		res.json({ user: req.user });
+	});
+
+	router.get("/me/sites", requireUser, async (req, res) => {
+		const _sites = await sites.selectSitesByOwnerId(db, req.user?.id);
+		res.json({ user: req.user, sites: _sites.rows });
 	});
 
 	return router;

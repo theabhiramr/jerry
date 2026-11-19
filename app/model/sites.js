@@ -23,3 +23,13 @@ export const selectAll = (pool) =>
 		"SELECT slug, name, description, owner_id, created_at FROM sites",
 		[],
 	);
+
+/**
+ * @param {import("pg").Pool | import("pg").PoolClient} pool
+ */
+export const selectSitesByOwnerId = (pool, ownerId) =>
+	query(
+		pool,
+		"SELECT slug, name, description, created_at FROM sites WHERE owner_id = $1",
+		[ownerId],
+	);

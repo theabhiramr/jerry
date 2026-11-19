@@ -3,6 +3,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { authRouter } from "./auth.js";
 import { session } from "../middleware/session.js";
+import { siteRouter } from "./site.js";
 
 export function apiRouter({ db, options }) {
 	const router = express.Router();
@@ -10,6 +11,7 @@ export function apiRouter({ db, options }) {
 	router.use(cookieParser());
 	router.use(session(db));
 	router.use("/auth", authRouter({ db, options }));
+	router.use("/site", siteRouter({ db, options }));
 
 	return router;
 }

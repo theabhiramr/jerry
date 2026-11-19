@@ -5,5 +5,5 @@ export interface User {
   username: string;
   email: string | null;
   active: boolean;
-  created_at: number;
+  created_at: Date;
 }

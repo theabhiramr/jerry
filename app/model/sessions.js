@@ -29,6 +29,20 @@ export const findUserId = async (pool, token) =>
   )?.user_id;
 
 /**
+ * @param {import("pg").Pool | import("pg").PoolClient} pool
+ * @param {string} token
+ */
+export const findUser = async (pool, token) =>
+  (await one(
+    pool,
+    `SELECT u.id, u.username
+       FROM sessions s
+       JOIN users u ON u.id = s.user_id
+      WHERE s.token = $1 AND s.expires_at > now() AND u.active`,
+    [token],
+  )) ?? null;
+
+/**
  * delete is not a valid js var name for obvious reasons smh...
  * @param {import("pg").Pool | import("pg").PoolClient} pool
  * @param {string} token

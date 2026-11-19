@@ -12,7 +12,6 @@
   "include": [
     "server.mjs",
     "app/**/*.js",
-    "scripts/**/*.js",
-    "test/**/*.js"
+    "app/**/*.d.ts"
   ]
 }

@@ -2,6 +2,10 @@ import express from "express";
 import argon2 from "argon2";
 import crypto from "crypto";
 import { create, findByUsername, getPasswordHash } from "../model/users.js";
+import * as sessions from "../model/sessions.js";
+
+const isEmpty = (value) =>
+  value == null || (typeof value === "string" && value.trim() === "");
 
 export function authRouter({ db, options }) {
   const router = express.Router();
@@ -19,25 +23,15 @@ export function authRouter({ db, options }) {
   let tokens = {};
 
   function validLoginBody(body) {
-    if (
-      !body.hasOwnProperty("username") ||
-      !body.hasOwnProperty("password") ||
-      !body.hasOwnProperty("email")
-    ) {
+    if (!body.hasOwnProperty("username") || !body.hasOwnProperty("password")) {
       return false;
     }
-    let { username, email, password } = body;
+    let { username, password } = body;
     return (
       typeof username === "string" &&
       typeof password === "string" &&
-      typeof email === "string" &&
       username.length >= 1 &&
-      username.length <= 25 &&
-      password.length >= 8 &&
-      password.length <= 100 &&
-      email.length >= 5 &&
-      email.length <= 100 &&
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+      username.length <= 25
     );
   }
 
@@ -101,12 +95,11 @@ export function authRouter({ db, options }) {
       return res.status(500).json({ error: "Something went wrong" });
     }
 
-    if (result.rows.length === 0) {
+    if (result === null) {
       return res.status(400).json({ error: "Incorrect username or password" });
     }
 
-    let passwordHash = result.rows[0].hash;
-    let validPassword;
+    let passwordHash = result.hash;
     try {
       if (!(await argon2.verify(passwordHash, password))) {
         return res
@@ -118,18 +111,17 @@ export function authRouter({ db, options }) {
       return res.status(500).json({ error: "Something went wrong" });
     }
 
-    let token = generateToken(); // TODO: store token in session table
-    tokens[token] = result.rows[0].id;
+    const token = await sessions.create(db, result.id);
     return res
       .cookie("token", token, cookieOptions)
       .status(200)
       .json({ message: "Success" });
   });
 
-  router.post("/logout", (req, res) => {
+  router.post("/logout", async (req, res) => {
     let { token } = req.cookies;
-    if (token !== undefined) {
-      delete tokens[token];
+    if (!isEmpty(token)) {
+      await sessions.remove(db, token);
     }
     return res
       .clearCookie("token", cookieOptions)
@@ -137,12 +129,13 @@ export function authRouter({ db, options }) {
       .json({ message: "Success" });
   });
 
-  router.get("/me", (req, res) => {
+  router.get("/me", async (req, res) => {
     let { token } = req.cookies;
-    if (token === undefined || !tokens.hasOwnProperty(token)) {
+    const userId = await sessions.findUserId(db, token);
+    if (isEmpty(token) || isEmpty(userId)) {
       return res.status(403).json({ error: "Unauthorized" });
     }
-    return res.status(200).json({ userId: tokens[token] });
+    return res.status(200).json({ userId });
   });
 
   return router;

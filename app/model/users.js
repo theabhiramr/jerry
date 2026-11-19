@@ -1,5 +1,5 @@
 import pg from "pg";
-import { query } from "../db/index.js";
+import { one, query } from "../db/index.js";
 
 /**
  * @param {pg.Pool | pg.PoolClient} pool
@@ -33,4 +33,4 @@ export const findByUsername = (pool, username) =>
  * @returns {Promise<any>}
  */
 export const getPasswordHash = (pool, username) =>
-  query(pool, `SELECT hash FROM users WHERE username = $1`, [username]);
+  one(pool, `SELECT id, hash FROM users WHERE username = $1`, [username]);

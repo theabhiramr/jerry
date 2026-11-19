@@ -32,7 +32,7 @@ export async function one(db, sql, params) {
  * @param {(client: import("pg").PoolClient) => T} fn
  * @returns {Promise<T>}
  */
-async function tx(pool, fn) {
+export async function tx(pool, fn) {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");

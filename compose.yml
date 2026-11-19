@@ -13,7 +13,6 @@ services:
       - "127.0.0.1:5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql
-      - ./migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test:
         ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d jerry"]
@@ -32,7 +31,7 @@ services:
     environment:
       DATABASE_URL: *database-url
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     develop:
       watch:
         - { action: sync, path: ./app, target: /app/app }
@@ -40,8 +39,10 @@ services:
         - { action: sync, path: ./server.mjs, target: /app/server.mjs }
         - { action: rebuild, path: package.json }
         - { action: rebuild, path: package-lock.json }
+        - { action: sync+restart, path: ./migrations, target: /app/migrations }
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
 volumes:
   pg_data:

@@ -1,4 +1,4 @@
-FROM node:26-alpine as base
+FROM node:26-alpine AS base
 WORKDIR /app
 RUN chown node:node /app
 USER node

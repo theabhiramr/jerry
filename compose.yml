@@ -1,47 +1,45 @@
+x-database-url: &database-url postgresql://${POSTGRES_USER:-jerry}:${POSTGRES_PASSWORD:-jerry}@postgres:5432/jerry
+
 services:
   postgres:
     image: postgres:18
-    restart: always
+    restart: unless-stopped
     shm_size: 128mb
     environment:
       POSTGRES_USER: "${POSTGRES_USER:-jerry}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-jerry}"
+      POSTGRES_DB: jerry
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql
       - ./migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U jerry -d jerry"]
-      interval: 5s
+      test:
+        ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d jerry"]
+      interval: 2s
       timeout: 3s
-      retries: 10
+      retries: 20
+
   jerry:
     build:
       context: .
+      target: dev
+    init: true
+    env_file:
+      - path: .env
+        required: false
     environment:
-      - DEBUG=express:*,router,router:*
+      DATABASE_URL: *database-url
     ports:
       - "3000:3000"
     develop:
       watch:
-        - action: sync
-          path: ./app
-          target: /app/app
-          ignore:
-            - node_modules/
-        - action: sync
-          path: ./public
-          target: /app/public
-          ignore:
-            - node_modules/
-        - action: sync
-          path: ./server.mjs
-          target: /app/server.mjs
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: package.json
+        - { action: sync, path: ./app, target: /app/app }
+        - { action: sync, path: ./public, target: /app/public }
+        - { action: sync, path: ./server.mjs, target: /app/server.mjs }
+        - { action: rebuild, path: package.json }
+        - { action: rebuild, path: package-lock.json }
     depends_on:
       - postgres
 

@@ -4,6 +4,7 @@ import { one, query } from "../db/index.js";
 /**
  * @param {import("pg").Pool | import("pg").PoolClient} pool
  * @param {string} userId
+ * TODO: insert hash of token instead of actual token
  */
 export async function create(pool, userId) {
   const token = crypto.randomBytes(32).toString("hex");

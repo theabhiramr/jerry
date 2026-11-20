@@ -16,6 +16,21 @@ export const create = (pool, { slug, name, description, owner_id }) =>
 
 /**
  * @param {import("pg").Pool | import("pg").PoolClient} pool
+ * TODO: add owner role
+ */
+export const addMemberToSite = (pool, { siteId, userId, role }) =>
+	one(
+		pool,
+		`
+		INSERT INTO site_members (site_id, user_id, role)
+		VALUES ($1, $2, $3)
+		RETURNING site_id, user_id, role, created_at
+		`,
+		[siteId, userId, role],
+	);
+
+/**
+ * @param {import("pg").Pool | import("pg").PoolClient} pool
  */
 export const selectAll = (pool) =>
 	query(

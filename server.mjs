@@ -10,7 +10,7 @@ const pool = createPool(
 );
 
 await migrate(pool, path.join(import.meta.dirname, "migrations"));
-const app = createApp({ db: pool, options: {} });
+const app = createApp({ pool });
 
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running at http://localhost:${port}/`);

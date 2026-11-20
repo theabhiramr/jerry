@@ -11,9 +11,9 @@ import { apiRouter } from "./routes/api.js";
 //   dedent: "dedent.mjs",
 // };
 
-export function createApp({ db, options }) {
+export function createApp({ db }) {
   const app = express();
-  app.use("/api", apiRouter({ db, options }));
+  app.use("/api", apiRouter({ db }));
 
   // const importMap = { imports: {} };
   // for (const [name, file] of Object.entries(dependencies)) {

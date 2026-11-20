@@ -9,7 +9,7 @@ import { requireUser } from "../middleware/session.js";
 const isEmpty = (value) =>
 	value == null || (typeof value === "string" && value.trim() === "");
 
-export function authRouter({ db, options }) {
+export function authRouter() {
 	const router = express.Router();
 
 	const WEEK_IN_MS = 1000 * 60 * 60 * 24 * 7;
@@ -50,7 +50,7 @@ export function authRouter({ db, options }) {
 
 		let result;
 		try {
-			result = await findByUsername(db, username);
+			result = await findByUsername(req.db, username);
 		} catch (error) {
 			console.log(error);
 			return res.status(500).json({ error: "Something went wrong" });
@@ -69,7 +69,7 @@ export function authRouter({ db, options }) {
 		}
 
 		try {
-			result = await create(db, { username, email, passwordHash });
+			result = await create(req.db, { username, email, passwordHash });
 		} catch (error) {
 			console.log(error);
 			return res.status(500).json({ error: "Something went wrong" });
@@ -91,7 +91,7 @@ export function authRouter({ db, options }) {
 
 		let result;
 		try {
-			result = await getPasswordHash(db, username);
+			result = await getPasswordHash(req.db, username);
 		} catch (error) {
 			console.log(error);
 			return res.status(500).json({ error: "Something went wrong" });
@@ -113,7 +113,7 @@ export function authRouter({ db, options }) {
 			return res.status(500).json({ error: "Something went wrong" });
 		}
 
-		const token = await sessions.create(db, result.id);
+		const token = await sessions.create(req.db, result.id);
 		return res
 			.cookie("token", token, cookieOptions)
 			.status(200)
@@ -123,7 +123,7 @@ export function authRouter({ db, options }) {
 	router.post("/logout", async (req, res) => {
 		let { token } = req.cookies;
 		if (!isEmpty(token)) {
-			await sessions.remove(db, token);
+			await sessions.remove(req.db, token);
 		}
 		return res
 			.clearCookie("token", cookieOptions)
@@ -136,7 +136,7 @@ export function authRouter({ db, options }) {
 	});
 
 	router.get("/me/sites", requireUser, async (req, res) => {
-		const _sites = await sites.selectSitesByOwnerId(db, req.user?.id);
+		const _sites = await sites.selectSitesByOwnerId(req.db, req.user?.id);
 		res.json({ user: req.user, sites: _sites.rows });
 	});
 
